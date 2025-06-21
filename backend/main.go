@@ -45,7 +45,7 @@ func main() {
 	api.HandleFunc("/stats", statsHandler.HandleStats).Methods("GET")
 
 	// Serve static files
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("../frontend")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend")))
 
 	// Create HTTP server
 	srv := &http.Server{
