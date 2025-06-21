@@ -1,10 +1,7 @@
--- Create database
-CREATE DATABASE catsordogs;
+-- This file should NOT create the DB if you're using POSTGRES_DB
+-- Connect to it instead
+\connect catsordogs;
 
--- Connect to database
-\c catsordogs;
-
--- Create votes table
 CREATE TABLE IF NOT EXISTS votes (
                                      id SERIAL PRIMARY KEY,
                                      name VARCHAR(100) NOT NULL,
@@ -13,8 +10,5 @@ CREATE TABLE IF NOT EXISTS votes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
--- Create index on email for faster lookups
 CREATE INDEX IF NOT EXISTS idx_votes_email ON votes(email);
-
--- Create index on choice for faster stats queries
 CREATE INDEX IF NOT EXISTS idx_votes_choice ON votes(choice);
