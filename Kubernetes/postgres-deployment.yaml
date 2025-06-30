@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: postgres-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -27,4 +27,4 @@ spec:
       volumes:
         - name: cod-data
           persistentVolumeClaim:
-            claimName: postgres-pvc
+            claimName: catsordogs-postgres-pvc
