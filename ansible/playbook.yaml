@@ -1,0 +1,52 @@
+---
+- name: Provision EC2 with Minikube + CatsOrDogs app
+  hosts: app
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - curl
+          - wget
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - docker.io
+        state: present
+
+    - name: Add user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Install kubectl
+      shell: |
+        curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+    - name: Install Minikube
+      shell: |
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        install minikube-linux-amd64 /usr/local/bin/minikube
+
+    - name: Start Minikube
+      shell: |
+        minikube start --driver=docker
+      environment:
+        CHANGE_MINIKUBE_NONE_USER: "true"
+
+    - name: Clone CatsOrDogs repo
+      git:
+        repo: https://github.com/nsahil992/CatsOrDogs.git
+        dest: /home/ubuntu/CatsOrDogs
+
+    - name: Apply Kubernetes manifests
+      shell: |
+        kubectl apply -f /home/ubuntu/CatsOrDogs/Kubernetes
