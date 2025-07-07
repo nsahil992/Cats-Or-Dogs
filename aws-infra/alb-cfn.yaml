@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Application Load Balancer for CatsOrDogs App
+
+Parameters:
+  VPCId:
+    Type: String
+  SubnetId:
+    Type: String
+  InstanceId:
+    Type: String
+  ALBSecurityGroupId:
+    Type: String
+
+Resources:
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: cod-alb
+      Scheme: internet-facing
+      Subnets:
+        - !Ref SubnetId
+      SecurityGroups:
+        - !Ref ALBSecurityGroupId
+      Type: application
+      IpAddressType: ipv4
+      Tags:
+        - Key: Name
+          Value: cod-alb
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: cod-target-group
+      Port: 8080
+      Protocol: HTTP
+      VpcId: !Ref VPCId
+      TargetType: instance
+      HealthCheckPath: /
+      Matcher:
+        HttpCode: 200
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref ALB
+      Port: 80
+      Protocol: HTTP
+
+  RegisterTarget:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroupAttachment
+    Properties:
+      TargetGroupArn: !Ref TargetGroup
+      TargetId: !Ref InstanceId
+      Port: 8080
